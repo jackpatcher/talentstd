@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "TalentStd",
+    "slug": "talentstd",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FBFBF9"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.talentstd.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FBFBF9"
+      },
+      "package": "com.talentstd.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "webpack",
+      "output": "static",
+      "name": "TalentStd",
+      "shortName": "TalentStd",
+      "description": "ระบบรับนักเรียนความสามารถพิเศษ",
+      "themeColor": "#4A7C9E",
+      "backgroundColor": "#FBFBF9",
+      "display": "standalone",
+      "orientation": "any",
+      "startUrl": "/"
+    }
+  }
+}
