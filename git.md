@@ -1,3 +1,3 @@
 git add .
-git commit -m "1.1st"
+git commit -m "ปรับไอคอน"
 git push -u origin main

@@ -2,13 +2,12 @@
 // App.js - Entry Point & Navigation
 // =============================================
 import React, { useEffect, useState } from 'react';
-import { Platform, View, ActivityIndicator } from 'react-native';
-import * as Font from 'expo-font';
+import { Platform } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { NavigationContainer } from '@react-navigation/native';
 import DrawerNavigator from './src/navigation/DrawerNavigator';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
-import { MOBILE_BREAKPOINT } from './src/utils/theme';
+import { MOBILE_BREAKPOINT, NAV_THEME } from './src/utils/theme';
 import { setApiUrl } from './src/services/api';
 import { getCache } from './src/services/cache';
 
@@ -27,6 +26,7 @@ import {
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
+  const useDrawerNavigation = Platform.OS !== 'web' && !isMobile;
   const [fontsLoaded] = useFonts({
     Sarabun_100Thin,
     Sarabun_300Light,
@@ -63,8 +63,8 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      {isMobile ? <BottomTabNavigator /> : <DrawerNavigator />}
+    <NavigationContainer theme={NAV_THEME}>
+      {useDrawerNavigation ? <DrawerNavigator /> : <BottomTabNavigator />}
     </NavigationContainer>
   );
 }

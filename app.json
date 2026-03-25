@@ -28,8 +28,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "webpack",
-      "output": "static",
+      "bundler": "metro",
+      "output": "single",
       "name": "TalentStd",
       "shortName": "TalentStd",
       "description": "ระบบรับนักเรียนความสามารถพิเศษ",

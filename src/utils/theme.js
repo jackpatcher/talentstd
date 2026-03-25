@@ -4,46 +4,46 @@
 
 export const COLORS = {
   // Backgrounds
-  background:    '#FBFBF9',   // Warm off-white main bg
-  surface:       '#F5F5F0',   // Slightly darker surface
-  surfaceAlt:    '#EFECE6',   // Card bg, inputs
-  border:        '#E0DDD8',   // Dividers, input borders
-  borderLight:   '#ECEAE6',
+  background:    '#F4F7FB',
+  surface:       '#FFFFFF',
+  surfaceAlt:    '#EEF2F7',
+  border:        '#D8E0EA',
+  borderLight:   '#E8EDF4',
 
   // Brand
-  primary:       '#4A7C9E',   // Main blue (calm, professional)
-  primaryLight:  '#D0E4F0',   // Light tint for backgrounds
-  primaryDark:   '#2E5F7A',
-  secondary:     '#5E8A52',   // Green for success-like accents
-  accent:        '#9E6B4A',   // Warm brown for highlights
+  primary:       '#2563EB',
+  primaryLight:  '#DBEAFE',
+  primaryDark:   '#1E40AF',
+  secondary:     '#0D9488',
+  accent:        '#7C3AED',
 
   // Text
-  text:          '#2C2C2C',   // Off-black
-  textSecondary: '#555550',
-  textMuted:     '#909090',
-  textOnDark:    '#F5F5F0',
+  text:          '#0F172A',
+  textSecondary: '#334155',
+  textMuted:     '#64748B',
+  textOnDark:    '#F8FAFC',
 
   // Status
-  error:         '#C0392B',
-  errorLight:    '#FDEDEC',
-  warning:       '#D68910',
-  warningLight:  '#FEF9E7',
-  success:       '#27824A',
-  successLight:  '#EAFAF1',
-  info:          '#2471A3',
-  infoLight:     '#EBF5FB',
+  error:         '#DC2626',
+  errorLight:    '#FEE2E2',
+  warning:       '#D97706',
+  warningLight:  '#FEF3C7',
+  success:       '#16A34A',
+  successLight:  '#DCFCE7',
+  info:          '#0284C7',
+  infoLight:     '#E0F2FE',
 
   // Navigation
-  drawerBg:      '#2C3A4A',
-  drawerItem:    '#3D5269',
-  drawerActive:  '#4A7C9E',
-  drawerText:    '#C8D8E8',
+  drawerBg:      '#0F172A',
+  drawerItem:    '#1E293B',
+  drawerActive:  '#2563EB',
+  drawerText:    '#CBD5E1',
   drawerTextActive: '#FFFFFF',
 
   // Misc
-  white:         '#FBFBF9',
-  black:         '#2C2C2C',
-  overlay:       'rgba(44, 44, 44, 0.55)',
+  white:         '#FFFFFF',
+  black:         '#0F172A',
+  overlay:       'rgba(15, 23, 42, 0.55)',
   transparent:   'transparent',
 };
 
@@ -89,25 +89,37 @@ export const BORDER_RADIUS = {
 export const SHADOWS = {
   none: {},
   small: {
-    shadowColor: '#2C2C2C',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 3,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     elevation: 2,
   },
   medium: {
-    shadowColor: '#2C2C2C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.10,
-    shadowRadius: 8,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
     elevation: 4,
   },
   large: {
-    shadowColor: '#2C2C2C',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.14,
-    shadowRadius: 16,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.16,
+    shadowRadius: 24,
     elevation: 8,
+  },
+};
+
+export const NAV_THEME = {
+  dark: false,
+  colors: {
+    primary: COLORS.primary,
+    background: COLORS.background,
+    card: COLORS.surface,
+    text: COLORS.text,
+    border: COLORS.borderLight,
+    notification: COLORS.accent,
   },
 };
 
