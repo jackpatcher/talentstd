@@ -1,0 +1,57 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# React Native / Expo
+.expo/
+.expo-shared/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+.env
+
+# Build artifacts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Logs
+logs/
+*.log
+
+# Backend (Google Apps Script)
+.clasp.json
+appsscript.json
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# Firebase
+.firebaserc
+firebase-debug.log
+
+# Package lock files (optional - uncomment if you want to track these)
+# package-lock.json
+# yarn.lock
