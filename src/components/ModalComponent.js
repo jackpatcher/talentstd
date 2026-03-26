@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     maxWidth: 480,
     width: '100%',
     ...SHADOWS.medium,
-    ...Platform.select({ web: { outline: 'none' } }),
+    // Removed outline for web compatibility
   },
 });

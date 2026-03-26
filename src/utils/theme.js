@@ -1,6 +1,10 @@
+
+import { Platform } from 'react-native';
 // =============================================
 // TalentStd - Design System / Theme Constants
 // =============================================
+
+const isWeb = Platform.OS === 'web';
 
 export const COLORS = {
   // Backgrounds
@@ -89,24 +93,39 @@ export const BORDER_RADIUS = {
 export const SHADOWS = {
   none: {},
   small: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+    ...(isWeb
+      ? { boxShadow: '0 2px 8px rgba(15,23,42,0.08)' }
+      : {
+          shadowColor: '#0F172A',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 6,
+        }
+    ),
     elevation: 2,
   },
   medium: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
+    ...(isWeb
+      ? { boxShadow: '0 6px 24px rgba(15,23,42,0.12)' }
+      : {
+          shadowColor: '#0F172A',
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.12,
+          shadowRadius: 12,
+        }
+    ),
     elevation: 4,
   },
   large: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.16,
-    shadowRadius: 24,
+    ...(isWeb
+      ? { boxShadow: '0 10px 48px rgba(15,23,42,0.16)' }
+      : {
+          shadowColor: '#0F172A',
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.16,
+          shadowRadius: 24,
+        }
+    ),
     elevation: 8,
   },
 };
@@ -123,7 +142,7 @@ export const NAV_THEME = {
   },
 };
 
-export const DRAWER_WIDTH = 260;
+export const DRAWER_WIDTH = 80;
 export const MOBILE_BREAKPOINT = 768;
 
 // Common reusable style objects

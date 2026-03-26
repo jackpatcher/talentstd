@@ -1,17 +1,25 @@
 // =============================================
 // JudgeLoginScreen - เข้าสู่ระบบกรรมการ
 // =============================================
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, FONT_SIZES, SPACING, commonStyles, BORDER_RADIUS, SHADOWS } from '../../utils/theme';
-import { loginJudge } from '../../services/auth';
+import { loginJudge, isLoggedIn } from '../../services/auth';
 import ToastComponent from '../../components/ToastComponent';
 
 export default function JudgeLoginScreen({ navigation }) {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'info' });
+
+  useEffect(() => {
+    (async () => {
+      if (await isLoggedIn()) {
+        navigation.replace('JudgeStudents');
+      }
+    })();
+  }, []);
 
   const handleLogin = async () => {
     setLoading(true);

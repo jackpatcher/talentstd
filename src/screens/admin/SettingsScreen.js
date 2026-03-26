@@ -6,17 +6,23 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { COLORS, FONTS, FONT_SIZES, SPACING, commonStyles } from '../../utils/theme';
 import { api } from '../../services/api';
 
+import GlobalLoadingModal from '../../components/GlobalLoadingModal';
+
+
 export default function SettingsScreen() {
   const [config, setConfig] = useState({});
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     fetchConfig();
   }, []);
 
   async function fetchConfig() {
+    setFetching(true);
     const res = await api.getConfig();
     if (res.success) setConfig(res.config);
+    setFetching(false);
   }
 
   async function saveConfig() {
@@ -29,6 +35,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={commonStyles.screen}>
+      <GlobalLoadingModal visible={loading || fetching} />
       <Text style={styles.title}>ตั้งค่าระบบ</Text>
       <TextInput
         style={styles.input}

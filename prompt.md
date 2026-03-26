@@ -10,7 +10,7 @@
 
 ### 2. Frontend Requirements (React Native Expo)
 - **UI/UX & Responsiveness:**
-  - Tablet/Desktop: แสดง Drawer Menu ด้านซ้าย (มีไอคอน + ข้อความ) และพื้นที่ Content อยู่ด้านขวา
+  - Tablet/Desktop: แสดง Sidebar Menu ด้านซ้าย (มีไอคอน + ข้อความอยู่ใต้ไอคอน) และพื้นที่ Content อยู่ด้านขวา
   - Mobile: เปลี่ยนจาก Drawer Menu เป็น Bottom Navigation โดยอัตโนมัติตามขนาดหน้าจอ
 - **Theme & Typography:**
   - Font: ใช้ฟอนต์ "TH Sarabun" ทั้งระบบ
@@ -71,7 +71,7 @@ Please read the following requirements carefully and generate the code step-by-s
 
 ### 2. Frontend Requirements (React Native Expo)
 - **UI/UX & Responsiveness:**
-  - Tablet/Desktop: Display a Left Drawer Menu (Icon + Text) and right-side content area.
+  - Tablet/Desktop: Display a Left sidebar Menu (Icon + Text bottom of icon) and right-side content area.
   - Mobile: Switch from Drawer to Bottom Navigation automatically based on screen size.
 - **Theme & Typography:**
   - Font: Use "TH Sarabun" globally.

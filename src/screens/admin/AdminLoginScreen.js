@@ -1,17 +1,25 @@
 // =============================================
 // AdminLoginScreen - เข้าสู่ระบบแอดมิน
 // =============================================
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, FONT_SIZES, SPACING, commonStyles, BORDER_RADIUS, SHADOWS } from '../../utils/theme';
-import { loginAdmin } from '../../services/auth';
+import { loginAdmin, isLoggedIn } from '../../services/auth';
 import ToastComponent from '../../components/ToastComponent';
 
 export default function AdminLoginScreen({ navigation }) {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'info' });
+
+  useEffect(() => {
+    (async () => {
+      if (await isLoggedIn()) {
+        navigation.replace('Admissions');
+      }
+    })();
+  }, []);
 
   const handleLogin = async () => {
     setLoading(true);

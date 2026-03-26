@@ -1,3 +1,9 @@
 git add .
-git commit -m "ืnode modules"
+git commit -m "sidebar home"
 git push -u origin main
+
+
+
+
+
+npx expo start -c

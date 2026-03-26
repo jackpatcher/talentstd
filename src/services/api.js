@@ -5,9 +5,12 @@
 
 import { Platform } from 'react-native';
 import { getDefaultKey, getMasterKey } from '../utils/keyGenerator';
+import { API_URL } from '../config';
 
 // ---- Config ----
-let _apiUrl = '';   // Set via setApiUrl() after loading from cache/config
+
+// Use API_URL from config.js as default
+let _apiUrl = API_URL;
 
 export function setApiUrl(url)  { _apiUrl = url; }
 export function getApiUrl()     { return _apiUrl; }

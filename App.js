@@ -1,10 +1,11 @@
 // =============================================
 // App.js - Entry Point & Navigation
 // =============================================
-import React, { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Platform, useWindowDimensions } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { NavigationContainer } from '@react-navigation/native';
+import * as Linking from 'expo-linking';
 import DrawerNavigator from './src/navigation/DrawerNavigator';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
 import { MOBILE_BREAKPOINT, NAV_THEME } from './src/utils/theme';
@@ -23,10 +24,8 @@ import {
   Sarabun_800ExtraBold,
 } from '@expo-google-fonts/sarabun';
 
+
 export default function App() {
-  const [isReady, setIsReady] = useState(false);
-  const [isMobile, setIsMobile] = useState(true);
-  const useDrawerNavigation = Platform.OS !== 'web' && !isMobile;
   const [fontsLoaded] = useFonts({
     Sarabun_100Thin,
     Sarabun_300Light,
@@ -36,18 +35,12 @@ export default function App() {
     Sarabun_700Bold,
     Sarabun_800ExtraBold,
   });
-
-  useEffect(() => {
-    // Responsive: detect mobile/tablet/desktop
-    function handleResize() {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    }
-    if (Platform.OS === 'web') {
-      handleResize();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
+  const [isReady, setIsReady] = React.useState(false);
+  const [navState, setNavState] = React.useState();
+  const navStateRef = useRef();
+  const dimensions = useWindowDimensions();
+  const isMobile = dimensions.width < MOBILE_BREAKPOINT;
+  const useDrawerNavigation = !isMobile;
 
   useEffect(() => {
     // Load API URL from cache/config
@@ -62,8 +55,46 @@ export default function App() {
     return <AppLoading />;
   }
 
+  // Deep linking config
+  const linking = {
+    prefixes: [Linking.createURL('/')],
+    config: {
+      screens: {
+        Home: 'home',
+        Admin: {
+          path: 'admin',
+          screens: {
+            AdminLogin: 'login',
+            Admissions: 'admissions',
+            Judges: 'judges',
+            Students: 'students',
+            Criteria: 'criteria',
+            Report: 'report',
+            Settings: 'settings',
+          },
+        },
+        Judge: {
+          path: 'judge',
+          screens: {
+            JudgeLogin: 'login',
+            JudgeStudents: 'students',
+            JudgeScore: 'score',
+          },
+        },
+      },
+    },
+  };
+
   return (
-    <NavigationContainer theme={NAV_THEME}>
+    <NavigationContainer
+      theme={NAV_THEME}
+      linking={linking}
+      initialState={navState}
+      onStateChange={state => {
+        setNavState(state);
+        navStateRef.current = state;
+      }}
+    >
       {useDrawerNavigation ? <DrawerNavigator /> : <BottomTabNavigator />}
     </NavigationContainer>
   );

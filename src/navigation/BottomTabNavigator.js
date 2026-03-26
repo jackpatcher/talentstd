@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AdminStack from './AdminStack';
 import JudgeStack from './JudgeStack';
+import HomeScreen from '../screens/HomeScreen';
 import { getSession } from '../services/auth';
 import { useEffect, useState } from 'react';
 import { COLORS, FONTS, FONT_SIZES } from '../utils/theme';
@@ -24,12 +25,17 @@ export default function BottomTabNavigator() {
 
   return (
     <Tab.Navigator
-      initialRouteName={role === 'admin' ? 'Admin' : 'Judge'}
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size, focused }) => {
-          const iconName = route.name === 'Admin'
-            ? (focused ? 'shield-checkmark' : 'shield-checkmark-outline')
-            : (focused ? 'clipboard' : 'clipboard-outline');
+          let iconName = 'help';
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Admin') {
+            iconName = focused ? 'shield-checkmark' : 'shield-checkmark-outline';
+          } else if (route.name === 'Judge') {
+            iconName = focused ? 'clipboard' : 'clipboard-outline';
+          }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: COLORS.primary,
@@ -52,8 +58,9 @@ export default function BottomTabNavigator() {
         },
       })}
     >
-      {(role === 'judge' || !role) && <Tab.Screen name="Judge" component={JudgeStack} options={{ title: 'กรรมการ' }} />}
-      {(role === 'admin' || !role) && <Tab.Screen name="Admin" component={AdminStack} options={{ title: 'แอดมิน' }} />}
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'หน้าหลัก' }} />
+      <Tab.Screen name="Judge" component={JudgeStack} options={{ title: 'กรรมการ' }} />
+      <Tab.Screen name="Admin" component={AdminStack} options={{ title: 'แอดมิน' }} />
     </Tab.Navigator>
   );
 }

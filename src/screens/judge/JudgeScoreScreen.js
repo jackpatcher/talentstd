@@ -5,7 +5,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 import { COLORS, FONTS, FONT_SIZES, SPACING, commonStyles } from '../../utils/theme';
 import { api } from '../../services/api';
+
 import ToastComponent from '../../components/ToastComponent';
+import GlobalLoadingModal from '../../components/GlobalLoadingModal';
+
 
 export default function JudgeScoreScreen({ route, navigation }) {
   const student = route.params?.student;
@@ -13,15 +16,18 @@ export default function JudgeScoreScreen({ route, navigation }) {
   const [scores, setScores] = useState([]);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'info' });
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     fetchCriteria();
   }, []);
 
   async function fetchCriteria() {
+    setFetching(true);
     // TODO: ต้องเลือก admissionId จริง (mock)
     const res = await api.getCriteria('admissionId-mock');
     if (res.success) setCriteria(res.criteria);
+    setFetching(false);
   }
 
   function handleScoreChange(catIdx, itemIdx, value, maxScore) {
@@ -60,6 +66,7 @@ export default function JudgeScoreScreen({ route, navigation }) {
 
   return (
     <ScrollView style={commonStyles.screen} contentContainerStyle={styles.container}>
+      <GlobalLoadingModal visible={loading || fetching} />
       <Text style={styles.title}>กรอกคะแนน: {student?.firstName} {student?.lastName}</Text>
       {criteria.map((cat, catIdx) => (
         <View key={catIdx} style={styles.catBox}>
