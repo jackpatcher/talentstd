@@ -1,5 +1,5 @@
 // =============================================
-// GlobalLoadingModal - Modal Loading บล็อกหน้าจอ
+// GlobalLoadingModal - Modal Loading แบบเต็มหน้าจอ
 // =============================================
 import React from 'react';
 import { Modal, View, ActivityIndicator, StyleSheet, Text } from 'react-native';

@@ -1,6 +1,7 @@
 // =============================================
 // App.js - Entry Point & Navigation
 // =============================================
+import './global.css';
 import React, { useEffect, useRef } from 'react';
 import { Platform, useWindowDimensions } from 'react-native';
 import AppLoading from 'expo-app-loading';

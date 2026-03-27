@@ -28,6 +28,9 @@
   - Key 1 (Dynamic Key): เป็นรหัสตัวเลขผสมตัวอักษรพิมพ์ใหญ่ 8-12 ตัว ที่สามารถสร้างได้หลายรูปแบบ แต่ต้องสกัดกลับมาเช็กได้ว่ามีรากฐานมาจาก Key 2 เท่านั้น
 - **API Communication (สำคัญ):** - ใช้ `fetch` ส่งข้อมูลแบบ `POST` Request ด้วย JSON payload 
   - **ต้อง** ตั้งค่า `redirect: 'follow'` ใน fetch options เพื่อจัดการปัญหา CORS ของ Google Apps Script ได้อย่างสมบูรณ์โดยไม่ต้องใช้ JSONP
+- **Routing (แบบ Next.js):** URL เป็นปลายทาง slug เช่น `/home`, `/judge/login`, `/admin/admissions` ใช้ Expo Linking config ร่วมกับ hash-based fallback เพื่อป้องกัน 404 บน GitHub Pages
+- **OTP PIN Input:** ช่องกรอกรหัส PIN 8 หลักเป็นกล่องแบบ OTP (8 กล่องเรียงแถว) กรอกครบแล้ว submit อัตโนมัติทันที ทำเป็น component กลาง
+- **Styling:** ใช้ **NativeWind (Tailwind RN)** สำหรับทุกส่วนของ UI (`className` prop) ติดตั้ง `nativewind`, `tailwindcss`, `metro.config.js`, `tailwind.config.js`, `global.css`
 
 ### 3. Backend Requirements (Google Apps Script - code.gs)
 - **Concurrency Control (สำคัญมาก):** ในฟังก์ชัน `doPost()` ต้องใช้ `LockService.getScriptLock()` (ตั้งเวลา waitLock) เสมอ ก่อนที่จะเขียนข้อมูลลงชีท เพื่อป้องกันปัญหากรรมการหลายคนกดเซฟคะแนนพร้อมกันแล้วข้อมูลทับซ้อนกัน
@@ -53,6 +56,10 @@
 **4.2 ระบบกรรมการ (เข้าระบบผ่านรหัส 8 ตัว):**
 - ดูรายชื่อนักเรียนที่ต้องประเมิน
 - กรอกคะแนนในแต่ละหัวข้อย่อย (มี Validation ดักไม่ให้กรอกเกินคะแนนเต็มของหัวข้อนั้นๆ)
+
+**4.3 ระบบ Logout (ทั้ง Admin และ กรรมการ):**
+- ทุกหน้าที่อยู่หลังจาก login ให้มีปุ่ม **ออกจากระบบ** แสดงสีเตือนไว้ที่ Header ด้านขวา
+- กดแล้ว: ล้าง session cache แล้ว reset นำทางกลับหน้า Login ทันที
 
 กรุณาเริ่มด้วยการสร้างโค้ด Backend (code.gs) ที่มี LockService และโครงสร้างชีทให้ครบถ้วนก่อน จากนั้นค่อยเริ่มเขียนโค้ดฝั่ง React Native
 
@@ -87,8 +94,11 @@ Please read the following requirements carefully and generate the code step-by-s
   - Implement a 2-key security system for API payload validation.
   - Key 2 (Master Seed): "amhandsomeandcooltidgun".
   - Key 1 (Dynamic Hash): An 8-12 character alphanumeric string (uppercase letters + numbers) generated deterministically using Key 2 as the root. The backend must be able to verify this relationship.
-- **API Communication (CRITICAL):** - Send JSON payloads via `POST` requests using `fetch()`.
-  - You MUST include `redirect: 'follow'` in the fetch options. This is the modern workaround to handle Google Apps Script CORS issues for React Native Web without resorting to JSONP.
+- **API Communication (CRITICAL):** Send JSON payloads via `POST` requests using `fetch()`.
+  - You MUST include `redirect: 'follow'` in the fetch options. This handles Google Apps Script CORS issues for React Native Web without JSONP.
+- **Routing (Next.js-style):** URLs must use slug-style paths (e.g., `/home`, `/judge/login`, `/admin/admissions`). Use Expo Linking deep-link config and hash-based fallback to prevent 404 errors on GitHub Pages.
+- **OTP PIN Input:** The 8-digit PIN entry screen must use an OTP-style UI — 8 individual boxes in a row. When all 8 digits are filled, submit fires automatically. Extract into a reusable `OtpPinInput` component.
+- **Styling:** Use **NativeWind (Tailwind for React Native)** for all UI styling (`className` prop on all components). Setup requires `nativewind`, `tailwindcss`, `metro.config.js` with `withNativeWind`, `tailwind.config.js` with custom brand colors, and a `global.css` entry point.
 
 ### 3. Backend Requirements (Google Apps Script - code.gs)
 - **Concurrency Control (CRITICAL):** Inside `doPost()`, you MUST implement `LockService.getScriptLock()` with a `waitLock` timer before writing any data to the sheets. This prevents data race conditions and overwrites when multiple judges submit scores simultaneously.
@@ -120,5 +130,9 @@ Please read the following requirements carefully and generate the code step-by-s
 - Login using the generated 8-digit PIN.
 - View assigned students and scoring rubrics.
 - Input scores for each sub-criteria. Implement UI validation so they cannot input a value higher than the defined Max Score.
+
+**4.3 Logout System (Both Admin & Judge):**
+- Every screen after login must show a prominent **Logout** button in the top-right header area (styled in warning/red color).
+- On press: clear the session cache and immediately `navigation.reset()` back to the Login screen.
 
 Please provide the code in logical chunks. Start with the `code.gs` for the backend logic, concurrency setup, and database structure instructions. Then proceed to the React Native setup.

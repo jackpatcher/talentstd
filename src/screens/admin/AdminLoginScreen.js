@@ -1,12 +1,13 @@
-// =============================================
+﻿// =============================================
 // AdminLoginScreen - เข้าสู่ระบบแอดมิน
 // =============================================
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, FONTS, FONT_SIZES, SPACING, commonStyles, BORDER_RADIUS, SHADOWS } from '../../utils/theme';
+import { COLORS } from '../../utils/theme';
 import { loginAdmin, isLoggedIn } from '../../services/auth';
 import ToastComponent from '../../components/ToastComponent';
+import OtpPinInput from '../../components/OtpPinInput';
 
 export default function AdminLoginScreen({ navigation }) {
   const [pin, setPin] = useState('');
@@ -15,98 +16,162 @@ export default function AdminLoginScreen({ navigation }) {
 
   useEffect(() => {
     (async () => {
-      if (await isLoggedIn()) {
-        navigation.replace('Admissions');
-      }
+      if (await isLoggedIn()) navigation.replace('Admissions');
     })();
   }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = async (pinValue = pin) => {
+    if (pinValue.length < 8) return;
     setLoading(true);
-    const res = await loginAdmin(pin);
+    const res = await loginAdmin(pinValue);
     setLoading(false);
     if (res.success) {
       navigation.replace('Admissions');
     } else {
+      setPin('');
       setToast({ visible: true, message: res.error || 'เข้าสู่ระบบไม่สำเร็จ', type: 'error' });
     }
   };
 
   return (
-    <View style={[commonStyles.screen, styles.container]}>
-      <View style={styles.badge}>
-        <Ionicons name="shield-checkmark" size={28} color={COLORS.primary} />
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
+      {/* Card */}
+      <View style={styles.card}>
+        {/* Colored header band */}
+        <View style={styles.header}>
+          <View style={styles.iconCircle}>
+            <Ionicons name="shield-checkmark" size={32} color={COLORS.primary} />
+          </View>
+          <Text style={styles.title}>เข้าสู่ระบบแอดมิน</Text>
+          <Text style={styles.subtitle}>จัดการระบบและข้อมูลผู้สมัคร</Text>
+        </View>
+
+        {/* Body */}
+        <View style={styles.body}>
+          <Text style={styles.label}>กรอก PIN เข้าสู่ระบบ PIN กรอก PIN เข้าสู่ระบบ</Text>
+
+          <OtpPinInput
+            value={pin}
+            onChange={setPin}
+            onComplete={handleLogin}
+            accentColor={COLORS.primary}
+          />
+
+          <Pressable
+            onPress={() => handleLogin()}
+            disabled={loading || pin.length < 8}
+            style={[styles.button, { backgroundColor: COLORS.primary, opacity: loading || pin.length < 8 ? 0.45 : 1 }]}
+          >
+            {loading ? (
+              <Text style={styles.buttonText}>กำลังเข้าสู่ระบบ......</Text>
+            ) : (
+              <>
+                <Ionicons name="log-in-outline" size={18} color="#fff" style={{ marginRight: 6 }} />
+                <Text style={styles.buttonText}>เข้าสู่ระบบ</Text>
+              </>
+            )}
+          </Pressable>
+
+          <View style={styles.hint}>
+            <Ionicons name="lock-closed-outline" size={14} color={COLORS.textMuted} />
+            <Text style={styles.hintText}>รหัส PIN อยู่ใน config ของ Google Sheets PIN รหัส PIN อยู่ใน config ของ Google Sheets config รหัส PIN อยู่ใน config ของ Google Sheets Google Sheets</Text>
+          </View>
+        </View>
       </View>
-      <Text style={styles.title}>เข้าสู่ระบบแอดมิน</Text>
-      <Text style={styles.subtitle}>จัดการระบบและข้อมูลผู้สมัคร</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="PIN 8 หลัก"
-        placeholderTextColor={COLORS.textMuted}
-        value={pin}
-        onChangeText={setPin}
-        keyboardType="numeric"
-        maxLength={8}
-        secureTextEntry
-      />
-      <Pressable style={[styles.button, loading && styles.buttonDisabled]} onPress={handleLogin} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}</Text>
-      </Pressable>
+
       <ToastComponent {...toast} onHide={() => setToast({ ...toast, visible: false })} />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: COLORS.background },
   container: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: SPACING.xl,
-    backgroundColor: COLORS.background,
+    padding: 24,
   },
-  badge: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: COLORS.primaryLight,
-    justifyContent: 'center',
+  card: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: COLORS.surface,
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+  header: {
+    backgroundColor: '#1D4ED8',
+    paddingTop: 36,
+    paddingBottom: 28,
+    paddingHorizontal: 24,
     alignItems: 'center',
-    marginBottom: SPACING.md,
+  },
+  iconCircle: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: '#FFFFFF22',
+    borderWidth: 2,
+    borderColor: '#FFFFFF55',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
   },
   title: {
-    ...FONTS.bold,
-    fontSize: FONT_SIZES.xxl,
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
+    fontSize: 22,
+    fontFamily: 'Sarabun_700Bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
   },
   subtitle: {
-    ...FONTS.regular,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.lg,
+    fontSize: 14,
+    fontFamily: 'Sarabun_400Regular',
+    color: '#FFFFFFCC',
   },
-  input: {
-    ...commonStyles.input,
-    width: 260,
-    borderRadius: BORDER_RADIUS.md,
-    marginBottom: SPACING.md,
-    textAlign: 'center',
+  body: {
+    padding: 28,
+    alignItems: 'center',
+  },
+  label: {
+    fontSize: 15,
+    fontFamily: 'Sarabun_600SemiBold',
+    color: COLORS.textSecondary,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
   },
   button: {
-    backgroundColor: COLORS.primary,
-    borderRadius: BORDER_RADIUS.md,
-    paddingVertical: SPACING.sm + 2,
-    paddingHorizontal: SPACING.xl,
-    minWidth: 200,
+    flexDirection: 'row',
     alignItems: 'center',
-    ...SHADOWS.small,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
+    justifyContent: 'center',
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 14,
+    marginTop: 6,
   },
   buttonText: {
-    ...FONTS.semiBold,
-    color: COLORS.textOnDark,
-    fontSize: FONT_SIZES.md,
+    fontSize: 16,
+    fontFamily: 'Sarabun_600SemiBold',
+    color: '#FFFFFF',
+  },
+  hint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 16,
+  },
+  hintText: {
+    fontSize: 12,
+    fontFamily: 'Sarabun_400Regular',
+    color: COLORS.textMuted,
+    marginLeft: 4,
   },
 });

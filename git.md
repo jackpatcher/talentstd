@@ -1,5 +1,5 @@
 git add .
-git commit -m "sidebar home"
+git commit -m "begin admin"
 git push -u origin main
 
 

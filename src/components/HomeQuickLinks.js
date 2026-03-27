@@ -7,17 +7,17 @@ export default function HomeQuickLinks() {
   const navigation = useNavigation();
   const links = [
     { label: 'เข้าสู่ระบบแอดมิน', screen: 'AdminLogin' },
-    { label: 'จัดการประเภทการรับ', screen: 'Admissions' },
+    { label: 'จัดการการรับนักเรียน', screen: 'Admissions' },
     { label: 'จัดการกรรมการ', screen: 'Judges' },
     { label: 'จัดการนักเรียน', screen: 'Students' },
     { label: 'จัดการเกณฑ์/ความสามารถ', screen: 'Criteria' },
-    { label: 'รายงานผล/พิมพ์', screen: 'Report' },
+    { label: 'รายงานผล/คะแนน', screen: 'Report' },
     { label: 'ตั้งค่า', screen: 'Settings' },
     { label: 'เข้าสู่ระบบกรรมการ', screen: 'JudgeLogin' },
   ];
   return (
     <View style={styles.linksWrap}>
-      <Text style={styles.quickTitle}>เมนูลัด</Text>
+      <Text style={styles.quickTitle}>ทางลัด</Text>
       <View style={styles.linksRow}>
         {links.map(link => (
           <TouchableOpacity

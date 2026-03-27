@@ -52,6 +52,14 @@ function doGet(e) {
 }
 
 function doPost(e) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+  } catch (lockErr) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: 'Server busy, please try again.' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   try {
     var params = {};
     if (e.postData && e.postData.contents) {
@@ -65,6 +73,8 @@ function doPost(e) {
     return ContentService
       .createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -113,9 +123,10 @@ function processRequest(params) {
     case 'save_criteria':  return saveCriteria(params);
 
     // Scores (คะแนน)
-    case 'get_scores':     return getScores(params);
-    case 'save_scores':    return saveScores(params);
-    case 'get_report':     return getReport(params);
+    case 'get_scores':               return getScores(params);
+    case 'save_scores':              return saveScores(params);
+    case 'get_report':               return getReport(params);
+    case 'get_admission_dashboard':  return getAdmissionDashboard(params);
 
     // Logs
     case 'archive_logs':   return archiveLogs();
@@ -669,6 +680,43 @@ function getReport(params) {
     isComplete: isComplete,
     judgesScored: scoresList.length,
     totalJudges: activeJudges.length
+  };
+}
+
+function getAdmissionDashboard(params) {
+  var admissionId = params.admissionId;
+  if (!admissionId) return { success: false, error: 'admissionId required' };
+
+  var studentsResult = getStudents({ admissionId: admissionId });
+  var students = studentsResult.students || [];
+
+  var judgesResult = getJudges({});
+  var allJudges = judgesResult.judges || [];
+  var activeJudges = allJudges.filter(function(j) { return j.isActive === true; });
+  var totalJudges = activeJudges.length;
+
+  var scoresResult = getScores({ admissionId: admissionId });
+  var allScores = scoresResult.scores || [];
+
+  var completeCount = 0;
+  var studentsWithStatus = students.map(function(student) {
+    var studentScores = allScores.filter(function(s) { return s.studentId === student.id; });
+    var judgesScored = studentScores.length;
+    var isComplete = totalJudges > 0 && judgesScored >= totalJudges;
+    if (isComplete) completeCount++;
+    return Object.assign({}, student, {
+      judgesScored: judgesScored,
+      totalJudges: totalJudges,
+      isComplete: isComplete
+    });
+  });
+
+  return {
+    success: true,
+    students: studentsWithStatus,
+    judges: activeJudges,
+    totalStudents: students.length,
+    completeCount: completeCount
   };
 }
 

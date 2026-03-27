@@ -1,5 +1,5 @@
 // =============================================
-// ToastComponent - แจ้งเตือนผู้ใช้แบบเข้าใจง่าย
+// ToastComponent - แจ้งเตือนแบบไม่รบกวน
 // =============================================
 import React, { useEffect } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';

@@ -49,18 +49,20 @@ function callJSONP(params) {
   });
 }
 
-// ---- Fetch (Native / SSR) ----
+// ---- Fetch (Native / SSR) — POST with JSON body ----
 
 async function callFetch(params) {
-  const qs = new URLSearchParams({
+  const payload = {
     ...params,
     key1: getDefaultKey(),
     key2: getMasterKey(),
-  });
+  };
 
-  const res = await fetch(`${_apiUrl}?${qs.toString()}`, {
-    method:  'GET',
-    headers: { Accept: 'application/json' },
+  const res = await fetch(_apiUrl, {
+    method:   'POST',
+    headers:  { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body:     JSON.stringify(payload),
+    redirect: 'follow',
   });
 
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -120,6 +122,7 @@ export const api = {
   getScores:  (params) => callAPI({ action: 'get_scores',  ...params }),
   saveScores: (data)   => callAPI({ action: 'save_scores', data: JSON.stringify(data) }),
   getReport:  (admissionId, studentId) => callAPI({ action: 'get_report', admissionId, studentId }),
+  getAdmissionDashboard: (admissionId) => callAPI({ action: 'get_admission_dashboard', admissionId }),
 
   // ── Logs ──────────────────────────────────────
   archiveLogs: () => callAPI({ action: 'archive_logs' }),
