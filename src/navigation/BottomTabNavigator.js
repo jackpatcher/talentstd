@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AdminStack from './AdminStack';
 import JudgeStack from './JudgeStack';
 import HomeScreen from '../screens/HomeScreen';
+import AboutScreen from '../screens/AboutScreen';
 import { getSession } from '../services/auth';
 import { useEffect, useState } from 'react';
 import { COLORS, FONTS, FONT_SIZES } from '../utils/theme';
@@ -33,6 +34,8 @@ export default function BottomTabNavigator() {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Admin') {
             iconName = focused ? 'shield-checkmark' : 'shield-checkmark-outline';
+          } else if (route.name === 'About') {
+            iconName = focused ? 'information-circle' : 'information-circle-outline';
           } else if (route.name === 'Judge') {
             iconName = focused ? 'clipboard' : 'clipboard-outline';
           }
@@ -61,6 +64,7 @@ export default function BottomTabNavigator() {
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'หน้าหลัก' }} />
       <Tab.Screen name="Judge" component={JudgeStack} options={{ title: 'กรรมการ' }} />
       <Tab.Screen name="Admin" component={AdminStack} options={{ title: 'แอดมิน' }} />
+      <Tab.Screen name="About" component={AboutScreen} options={{ title: 'เกี่ยวกับ' }} />
     </Tab.Navigator>
   );
 }

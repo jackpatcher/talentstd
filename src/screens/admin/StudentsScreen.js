@@ -14,7 +14,9 @@ import ModalComponent from '../../components/ModalComponent';
 import ToastComponent from '../../components/ToastComponent';
 import GlobalLoadingModal from '../../components/GlobalLoadingModal';
 
-const EMPTY_FORM = { prefix: '', firstName: '', lastName: '', studentCode: '', class: '' };
+const PREFIX_OPTIONS = ['นาย', 'นางสาว', 'เด็กชาย', 'เด็กหญิง'];
+const CLASS_LV_OPTIONS = ['ม.ต้น', 'ม.ปลาย'];
+const EMPTY_FORM = { prefix: '', firstName: '', lastName: '', classLv: '', gpa: '', sch: '', tel: '' };
 
 export default function StudentsScreen({ route }) {
   const preselected = route?.params?.admission || null;
@@ -83,8 +85,10 @@ export default function StudentsScreen({ route }) {
       prefix: item.prefix || '',
       firstName: item.firstName || '',
       lastName: item.lastName || '',
-      studentCode: item.studentCode || '',
-      class: item.class || '',
+      classLv: item.classLv || '',
+      gpa: item.gpa || '',
+      sch: item.sch || '',
+      tel: item.tel || '',
     });
     setModalVisible(true);
   }
@@ -160,9 +164,11 @@ export default function StudentsScreen({ route }) {
       <GlobalLoadingModal visible={loading} />
 
       <View style={S.header}>
-        <Pressable onPress={() => setStep('pick')} style={S.backBtn}>
-          <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
-        </Pressable>
+        {!preselected && (
+          <Pressable onPress={() => setStep('pick')} style={S.backBtn}>
+            <Ionicons name="arrow-back" size={20} color={COLORS.primary} />
+          </Pressable>
+        )}
         <View style={{ flex: 1 }}>
           <Text style={[S.headerTitle, { fontFamily: 'Sarabun_700Bold' }]} numberOfLines={1}>
             {selAdmission?.name}
@@ -200,11 +206,13 @@ export default function StudentsScreen({ route }) {
               <Text style={[S.studentName, { fontFamily: 'Sarabun_600SemiBold' }]}>
                 {item.prefix}{item.firstName} {item.lastName}
               </Text>
-              {(item.studentCode || item.class) ? (
+              {(item.classLv || item.gpa || item.previousSchool || item.phone) ? (
                 <Text style={[S.studentMeta, { fontFamily: 'Sarabun_400Regular' }]}>
                   {[
-                    item.studentCode && `รหัส: ${item.studentCode}`,
-                    item.class && `ชั้น: ${item.class}`,
+                    item.classLv && item.classLv,
+                    item.gpa && `เกรด: ${item.gpa}`,
+                    item.sch && item.sch,
+                    item.phone && `โทร: ${item.phone}`,
                   ].filter(Boolean).join('  ·  ')}
                 </Text>
               ) : null}
@@ -225,29 +233,99 @@ export default function StudentsScreen({ route }) {
         <Text style={[S.modalTitle, { fontFamily: 'Sarabun_700Bold' }]}>
           {selected ? 'แก้ไขนักเรียน' : 'เพิ่มนักเรียน'}
         </Text>
-        {[
-          { key: 'prefix', label: 'คำนำหน้า', placeholder: 'นาย / นางสาว / เด็กชาย / เด็กหญิง' },
-          { key: 'firstName', label: 'ชื่อ *', placeholder: 'ชื่อนักเรียน' },
-          { key: 'lastName', label: 'นามสกุล *', placeholder: 'นามสกุลนักเรียน' },
-          { key: 'studentCode', label: 'เลขประจำตัว', placeholder: 'เลขประจำตัวนักเรียน' },
-          { key: 'class', label: 'ชั้น/ห้อง', placeholder: 'เช่น ม.3/1' },
-        ].map(f => (
-          <View key={f.key} style={{ marginBottom: 12 }}>
-            <Text style={[S.fieldLabel, { fontFamily: 'Sarabun_500Medium' }]}>{f.label}</Text>
-            <TextInput
-              style={[S.input, { fontFamily: 'Sarabun_400Regular' }]}
-              placeholder={f.placeholder}
-              value={form[f.key]}
-              onChangeText={v => setForm({ ...form, [f.key]: v })}
-            />
-          </View>
-        ))}
+        {/* คำนำหน้า */}
+        <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>คำนำหน้า</Text>
+        <View style={S.chipRow}>
+          {PREFIX_OPTIONS.map(opt => (
+            <Pressable
+              key={opt}
+              onPress={() => setForm({ ...form, prefix: opt })}
+              style={[S.chip, form.prefix === opt && S.chipActive]}
+            >
+              <Text style={[S.chipText, { fontFamily: FONTS.regular }, form.prefix === opt && S.chipTextActive]}>
+                {opt}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* ชื่อ - นามสกุล */}
+        <View style={{ marginBottom: 12 }}>
+          <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>ชื่อ *</Text>
+          <TextInput
+            style={[S.input, { fontFamily: FONTS.regular }]}
+            placeholder="ชื่อนักเรียน"
+            value={form.firstName}
+            onChangeText={v => setForm({ ...form, firstName: v })}
+          />
+        </View>
+        <View style={{ marginBottom: 12 }}>
+          <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>นามสกุล *</Text>
+          <TextInput
+            style={[S.input, { fontFamily: FONTS.regular }]}
+            placeholder="นามสกุลนักเรียน"
+            value={form.lastName}
+            onChangeText={v => setForm({ ...form, lastName: v })}
+          />
+        </View>
+
+        {/* ระดับชั้น */}
+        <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>ระดับชั้น</Text>
+        <View style={S.chipRow}>
+          {CLASS_LV_OPTIONS.map(opt => (
+            <Pressable
+              key={opt}
+              onPress={() => setForm({ ...form, classLv: opt })}
+              style={[S.chip, form.classLv === opt && S.chipActive]}
+            >
+              <Text style={[S.chipText, { fontFamily: FONTS.regular }, form.classLv === opt && S.chipTextActive]}>
+                {opt}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* เกรดเฉลี่ย */}
+        <View style={{ marginBottom: 12 }}>
+          <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>เกรดเฉลี่ย 5 เทอม</Text>
+          <TextInput
+            style={[S.input, { fontFamily: FONTS.regular }]}
+            placeholder="เช่น 3.75"
+            value={form.gpa}
+            onChangeText={v => setForm({ ...form, gpa: v })}
+            keyboardType="decimal-pad"
+          />
+        </View>
+
+        {/* โรงเรียนเดิม */}
+        <View style={{ marginBottom: 12 }}>
+          <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>โรงเรียนเดิม</Text>
+          <TextInput
+            style={[S.input, { fontFamily: FONTS.regular }]}
+            placeholder="ชื่อโรงเรียนเดิม"
+            value={form.sch}
+            onChangeText={v => setForm({ ...form, sch: v })}
+          />
+        </View>
+
+        {/* เบอร์โทรศัพท์ */}
+        <View style={{ marginBottom: 12 }}>
+          <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>เบอร์โทรศัพท์</Text>
+          <TextInput
+            style={[S.input, { fontFamily: FONTS.regular }]}
+            placeholder="เบอร์โทรนักเรียน/ผู้ปกครอง"
+            value={form.tel}
+            onChangeText={v => setForm({ ...form, tel: v })}
+            keyboardType="phone-pad"
+          />
+        </View>
+
         <Pressable
           onPress={handleSave}
           disabled={saving || !form.firstName.trim() || !form.lastName.trim()}
           style={[S.saveBtn, { opacity: saving || !form.firstName.trim() ? 0.5 : 1, marginTop: 8 }]}
         >
-          <Text style={[S.saveBtnText, { fontFamily: 'Sarabun_600SemiBold' }]}>
+          <Text style={[S.saveBtnText, { fontFamily: FONTS.semiBold }]}>
             {saving ? 'กำลังบันทึก...' : 'บันทึก'}
           </Text>
         </Pressable>
@@ -358,4 +436,9 @@ const S = StyleSheet.create({
   },
   saveBtn: { backgroundColor: COLORS.primary, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
   saveBtnText: { color: '#fff', fontSize: 15 },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface },
+  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  chipText: { fontSize: 14, color: COLORS.textMuted },
+  chipTextActive: { color: '#fff' },
 });

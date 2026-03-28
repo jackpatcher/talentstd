@@ -7,6 +7,7 @@ import DrawerIconLabel from '../components/DrawerIconLabel';
 import AdminStack from './AdminStack';
 import JudgeStack from './JudgeStack';
 import HomeScreen from '../screens/HomeScreen';
+import AboutScreen from '../screens/AboutScreen';
 import { getSession } from '../services/auth';
 import { useEffect, useState } from 'react';
 import { COLORS, DRAWER_WIDTH, FONTS, FONT_SIZES } from '../utils/theme';
@@ -39,6 +40,9 @@ export default function DrawerNavigator() {
           } else if (route.name === 'Judge') {
             iconName = focused ? 'clipboard' : 'clipboard-outline';
             label = 'กรรมการ';
+          } else if (route.name === 'About') {
+            iconName = focused ? 'information-circle' : 'information-circle-outline';
+            label = 'เกี่ยวกับ';
           }
           return <DrawerIconLabel icon={iconName} label={label} focused={focused} />;
         },
@@ -61,6 +65,7 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="Home" component={HomeScreen} options={{ title: 'หน้าหลัก' }} />
       <Drawer.Screen name="Judge" component={JudgeStack} options={{ title: 'กรรมการ' }} />
       <Drawer.Screen name="Admin" component={AdminStack} options={{ title: 'แอดมิน' }} />
+      <Drawer.Screen name="About" component={AboutScreen} options={{ title: 'เกี่ยวกับ' }} />
     </Drawer.Navigator>
   );
 }

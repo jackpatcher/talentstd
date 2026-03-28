@@ -420,17 +420,17 @@ function getStudents(params) {
   var students = data.slice(1)
     .filter(function(row) { return row[0] !== ''; })
     .map(function(row) {
-      return {
+      var info = {};
+      try { info = JSON.parse(row[5] || '{}'); } catch(e) {}
+      return Object.assign({
         id: row[0],
-        studentCode: row[1],
-        prefix: row[2],
-        firstName: row[3],
-        lastName: row[4],
-        class: row[5],
-        level: row[6],
-        admissionId: row[7],
-        createdAt: row[8]
-      };
+        prefix: row[1],
+        firstName: row[2],
+        lastName: row[3],
+        classLv: row[4],
+        admissionId: row[6],
+        createdAt: row[7]
+      }, info);
     });
 
   if (admissionId) {
@@ -446,12 +446,14 @@ function createStudent(params) {
   if (!data.firstName || !data.lastName) return { success: false, error: 'firstName and lastName required' };
 
   var sheet = getOrCreateSheet(SHEETS.STUDENT);
-  ensureHeaders(sheet, ['id', 'studentCode', 'prefix', 'firstName', 'lastName', 'class', 'level', 'admissionId', 'createdAt']);
+  ensureHeaders(sheet, ['id', 'prefix', 'firstName', 'lastName', 'classLv', 'info', 'admissionId', 'createdAt']);
 
   var id = generateId();
   var now = new Date().toISOString();
-  sheet.appendRow([id, data.studentCode || '', data.prefix || '', data.firstName, data.lastName,
-                   data.class || '', data.level || '', data.admissionId || '', now]);
+  var info = {};
+  ['gpa', 'sch', 'tel'].forEach(function(k) { if (data[k] !== undefined && data[k] !== '') info[k] = data[k]; });
+  sheet.appendRow([id, data.prefix || '', data.firstName, data.lastName,
+                   data.classLv || '', JSON.stringify(info), data.admissionId || '', now]);
 
   return { success: true, id: id };
 }
@@ -466,18 +468,16 @@ function updateStudent(params) {
 
   for (var i = 1; i < rows.length; i++) {
     if (rows[i][0] === data.id) {
-      var updates = [
-        { col: 2, val: data.studentCode },
-        { col: 3, val: data.prefix },
-        { col: 4, val: data.firstName },
-        { col: 5, val: data.lastName },
-        { col: 6, val: data.class },
-        { col: 7, val: data.level },
-        { col: 8, val: data.admissionId }
-      ];
-      updates.forEach(function(u) {
-        if (u.val !== undefined) sheet.getRange(i + 1, u.col).setValue(u.val);
-      });
+      if (data.prefix !== undefined)      sheet.getRange(i + 1, 2).setValue(data.prefix);
+      if (data.firstName !== undefined)   sheet.getRange(i + 1, 3).setValue(data.firstName);
+      if (data.lastName !== undefined)    sheet.getRange(i + 1, 4).setValue(data.lastName);
+      if (data.classLv !== undefined)     sheet.getRange(i + 1, 5).setValue(data.classLv);
+      if (data.admissionId !== undefined) sheet.getRange(i + 1, 7).setValue(data.admissionId);
+      // Merge info JSON
+      var existing = {};
+      try { existing = JSON.parse(rows[i][5] || '{}'); } catch(e) {}
+      ['gpa', 'sch', 'tel'].forEach(function(k) { if (data[k] !== undefined) existing[k] = data[k]; });
+      sheet.getRange(i + 1, 6).setValue(JSON.stringify(existing));
       return { success: true };
     }
   }
@@ -870,7 +870,7 @@ function initializeSpreadsheet() {
   ensureHeaders(getSheet(SHEETS.USER), ['id','firstName','lastName','position','pin','role','isActive','createdAt']);
 
   getOrCreateSheet(SHEETS.STUDENT);
-  ensureHeaders(getSheet(SHEETS.STUDENT), ['id','studentCode','prefix','firstName','lastName','class','level','admissionId','createdAt']);
+  ensureHeaders(getSheet(SHEETS.STUDENT), ['id','prefix','firstName','lastName','classLv','info','admissionId','createdAt']);
 
   getOrCreateSheet(SHEETS.ADMISSION);
   ensureHeaders(getSheet(SHEETS.ADMISSION), ['id','name','level','description','isActive','createdAt']);
