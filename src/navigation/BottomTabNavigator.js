@@ -62,8 +62,8 @@ export default function BottomTabNavigator() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'หน้าหลัก' }} />
-      <Tab.Screen name="Judge" component={JudgeStack} options={{ title: 'กรรมการ' }} />
-      <Tab.Screen name="Admin" component={AdminStack} options={{ title: 'แอดมิน' }} />
+      <Tab.Screen name="Judge" component={JudgeStack} options={{ title: 'กรรมการ', headerShown: false }} />
+      <Tab.Screen name="Admin" component={AdminStack} options={{ title: 'แอดมิน', headerShown: false }} />
       <Tab.Screen name="About" component={AboutScreen} options={{ title: 'เกี่ยวกับ' }} />
     </Tab.Navigator>
   );

@@ -2,7 +2,7 @@
 // AdmissionsScreen - จัดการชื่อการรับนักเรียน
 // =============================================
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable, TextInput, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS } from '../../utils/theme';
 import { api } from '../../services/api';
@@ -16,9 +16,21 @@ export default function AdmissionsScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelected] = useState(null);
   const [formName, setFormName] = useState('');
+  const [formLevels, setFormLevels] = useState([]);
+  const [formYear, setFormYear] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'info' });
+  const [confirmDel, setConfirmDel] = useState({ visible: false, item: null });
+
+  function parseInfo(item) {
+    try { return JSON.parse(item.description || '{}'); } catch { return {}; }
+  }
+
+  function toggleLevel(lv) {
+    setFormLevels(prev => prev.includes(lv) ? [] : [lv]);
+  }
 
   useEffect(() => { fetchData(); }, []);
 
@@ -36,15 +48,27 @@ export default function AdmissionsScreen({ navigation }) {
     setLoading(false);
   }
 
-  function openAdd() { setSelected(null); setFormName(''); setModalVisible(true); }
-  function openEdit(item) { setSelected(item); setFormName(item.name); setModalVisible(true); }
+  function openAdd() {
+    setSelected(null); setFormName(''); setFormLevels([]); setFormYear(String(new Date().getFullYear() + 543));
+    setModalVisible(true);
+  }
+  function openEdit(item) {
+    const info = parseInfo(item);
+    setSelected(item);
+    setFormName(item.name);
+    setFormLevels(item.level ? item.level.split(',').map(s => s.trim()).filter(Boolean) : []);
+    setFormYear(info.year || '');
+    setModalVisible(true);
+  }
 
   async function handleSave() {
     if (!formName.trim()) return;
     setSaving(true);
+    const info = JSON.stringify({ year: formYear.trim() });
+    const payload = { name: formName.trim(), level: formLevels.join(', '), description: info };
     const res = selected
-      ? await api.updateAdmission({ id: selected.id, name: formName.trim() })
-      : await api.createAdmission({ name: formName.trim() });
+      ? await api.updateAdmission({ id: selected.id, ...payload })
+      : await api.createAdmission(payload);
     setSaving(false);
     if (res.success) {
       setToast({ visible: true, message: selected ? 'แก้ไขสำเร็จ' : 'เพิ่มสำเร็จ', type: 'success' });
@@ -56,25 +80,29 @@ export default function AdmissionsScreen({ navigation }) {
     }
   }
 
-  async function handleDelete(item) {
-    Alert.alert('ยืนยันการลบ', `ลบ "${item.name}" ใช่หรือไม่?`, [
-      { text: 'ยกเลิก', style: 'cancel' },
-      {
-        text: 'ลบ', style: 'destructive', onPress: async () => {
-          const res = await api.deleteAdmission(item.id);
-          if (res.success) {
-            setToast({ visible: true, message: 'ลบสำเร็จ', type: 'success' });
-            await removeCache('admissions');
-            fetchData(true);
-          }
-        },
-      },
-    ]);
+  function handleDelete(item) { setConfirmDel({ visible: true, item }); }
+
+  async function confirmDeleteItem() {
+    const item = confirmDel.item;
+    setConfirmDel({ visible: false, item: null });
+    setDeleting(true);
+    const res = await api.deleteAdmission(item.id);
+    setDeleting(false);
+    if (res.success) {
+      setToast({ visible: true, message: 'ลบสำเร็จ', type: 'success' });
+      await removeCache('admissions');
+      fetchData(true);
+    } else {
+      setToast({ visible: true, message: res.error || 'เกิดข้อผิดพลาด', type: 'error' });
+    }
   }
 
   return (
     <View style={S.root}>
-      <GlobalLoadingModal visible={loading} />
+      <GlobalLoadingModal
+        visible={loading || saving || deleting}
+        message={deleting ? 'กำลังลบข้อมูล...' : saving ? 'กำลังบันทึกข้อมูล...' : 'กำลังโหลดข้อมูล...'}
+      />
 
       {/* Header */}
       <View style={S.header}>
@@ -107,7 +135,14 @@ export default function AdmissionsScreen({ navigation }) {
             <View style={S.cardIconWrap}>
               <Ionicons name="school-outline" size={18} color={COLORS.primary} />
             </View>
-            <Text style={[S.cardName, { fontFamily: FONTS.medium }]}>{item.name}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[S.cardName, { fontFamily: FONTS.medium }]}>{item.name}</Text>
+              {(item.level || parseInfo(item).year) ? (
+                <Text style={[S.cardSub, { fontFamily: FONTS.regular }]}>
+                  {[item.level, parseInfo(item).year && `ปี ${parseInfo(item).year}`].filter(Boolean).join('  ·  ')}
+                </Text>
+              ) : null}
+            </View>
             <View style={S.actionRow}>
               <Pressable onPress={() => openEdit(item)} style={S.editBtn} hitSlop={8}>
                 <Ionicons name="pencil-outline" size={16} color={COLORS.primary} />
@@ -121,18 +156,45 @@ export default function AdmissionsScreen({ navigation }) {
         )}
       />
 
-      {/* Modal */}
+      {/* Form Modal */}
       <ModalComponent visible={modalVisible} onClose={() => setModalVisible(false)}>
-        <Text style={[S.modalTitle, { fontFamily: 'Sarabun_700Bold' }]}>
+        <Text style={[S.modalTitle, { fontFamily: FONTS.bold }]}>
           {selected ? 'แก้ไขการรับนักเรียน' : 'เพิ่มการรับนักเรียน'}
         </Text>
+
+        <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>ชื่อประเภทการรับ *</Text>
         <TextInput
           style={[S.input, { fontFamily: FONTS.regular }]}
-          placeholder="เช่น คอมพิวเตอร์ ม.ต้น"
+          placeholder="เช่น หุ่นยนต์และโดรน 2569"
           value={formName}
           onChangeText={setFormName}
           autoFocus
         />
+
+        <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>ระดับชั้น</Text>
+        <View style={S.chipRow}>
+          {['ม.ต้น', 'ม.ปลาย'].map(lv => (
+            <Pressable
+              key={lv}
+              onPress={() => toggleLevel(lv)}
+              style={[S.chip, formLevels.includes(lv) && S.chipActive]}
+            >
+              <Text style={[S.chipText, { fontFamily: FONTS.regular }, formLevels.includes(lv) && S.chipTextActive]}>
+                {lv}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        <Text style={[S.fieldLabel, { fontFamily: FONTS.medium }]}>ปีที่รับเข้า (พ.ศ.)</Text>
+        <TextInput
+          style={[S.input, { fontFamily: FONTS.regular }]}
+          placeholder="เช่น 2569"
+          value={formYear}
+          onChangeText={setFormYear}
+          keyboardType="number-pad"
+        />
+
         <Pressable
           onPress={handleSave}
           disabled={saving || !formName.trim()}
@@ -142,6 +204,28 @@ export default function AdmissionsScreen({ navigation }) {
             {saving ? 'กำลังบันทึก...' : 'บันทึก'}
           </Text>
         </Pressable>
+      </ModalComponent>
+
+      {/* Confirm Delete Modal */}
+      <ModalComponent visible={confirmDel.visible} onClose={() => setConfirmDel({ visible: false, item: null })}>
+        <Text style={[S.modalTitle, { fontFamily: FONTS.bold }]}>ยืนยันการลบ</Text>
+        <Text style={{ fontFamily: FONTS.regular, fontSize: 15, color: COLORS.text, marginBottom: 20 }}>
+          ลบ "{confirmDel.item?.name}" ใช่หรือไม่?
+        </Text>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <Pressable
+            onPress={() => setConfirmDel({ visible: false, item: null })}
+            style={{ flex: 1, paddingVertical: 11, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border }}
+          >
+            <Text style={{ fontFamily: FONTS.medium, color: COLORS.textSecondary, fontSize: 15 }}>ยกเลิก</Text>
+          </Pressable>
+          <Pressable
+            onPress={confirmDeleteItem}
+            style={{ flex: 1, paddingVertical: 11, borderRadius: 12, alignItems: 'center', backgroundColor: COLORS.error }}
+          >
+            <Text style={{ fontFamily: FONTS.semiBold, color: '#fff', fontSize: 15 }}>ลบ</Text>
+          </Pressable>
+        </View>
       </ModalComponent>
 
       <ToastComponent {...toast} onHide={() => setToast({ ...toast, visible: false })} />
@@ -198,11 +282,13 @@ const S = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cardName: { flex: 1, fontSize: 15, color: COLORS.text },
+  cardName: { fontSize: 15, color: COLORS.text },
+  cardSub: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
   actionRow: { flexDirection: 'row', gap: 8 },
   editBtn: { padding: 8, borderRadius: 8, backgroundColor: COLORS.primaryLight },
   delBtn: { padding: 8, borderRadius: 8, backgroundColor: COLORS.errorLight },
   modalTitle: { fontSize: 18, color: COLORS.text, marginBottom: 16 },
+  fieldLabel: { fontSize: 13, color: COLORS.textSecondary, marginBottom: 6 },
   input: {
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -212,8 +298,13 @@ const S = StyleSheet.create({
     fontSize: 15,
     color: COLORS.text,
     backgroundColor: COLORS.surface,
-    marginBottom: 16,
+    marginBottom: 14,
   },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.surface },
+  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  chipText: { fontSize: 14, color: COLORS.textMuted },
+  chipTextActive: { color: '#fff' },
   saveBtn: { backgroundColor: COLORS.primary, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
   saveBtnText: { color: '#fff', fontSize: 15 },
 });

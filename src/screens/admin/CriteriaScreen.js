@@ -16,7 +16,8 @@ import ToastComponent from '../../components/ToastComponent';
 import GlobalLoadingModal from '../../components/GlobalLoadingModal';
 
 export default function CriteriaScreen({ route }) {
-  const preselected = route?.params?.admission || null;
+  const raw = route?.params?.admission;
+  const preselected = (raw && typeof raw === 'object' && raw.id) ? raw : null;
   const [step, setStep] = useState(preselected ? 'edit' : 'pick'); // 'pick' | 'edit'
   const [admissions, setAdmissions] = useState([]);
   const [selAdmission, setSelAdmission] = useState(preselected);

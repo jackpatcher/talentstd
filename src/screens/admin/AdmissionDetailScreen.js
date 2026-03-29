@@ -42,10 +42,28 @@ const MENU_ITEMS = [
 ];
 
 export default function AdmissionDetailScreen({ route, navigation }) {
-  const { admission } = route.params || {};
+  const raw = route.params?.admission;
+  const admission = (raw && typeof raw === 'object' && raw.id) ? raw : null;
 
   function handleMenuPress(key) {
     navigation.navigate(key, { admission });
+  }
+
+  if (!admission) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background }}>
+        <Ionicons name="alert-circle-outline" size={48} color={COLORS.textMuted} />
+        <Text style={{ fontFamily: FONTS.regular, color: COLORS.textMuted, marginTop: 12, fontSize: 15 }}>
+          ไม่พบข้อมูลการรับนักเรียน
+        </Text>
+        <Pressable
+          onPress={() => navigation.navigate('Admissions')}
+          style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: COLORS.primary, borderRadius: 12 }}
+        >
+          <Text style={{ fontFamily: FONTS.semiBold, color: '#fff', fontSize: 14 }}>กลับหน้าหลัก</Text>
+        </Pressable>
+      </View>
+    );
   }
 
   return (

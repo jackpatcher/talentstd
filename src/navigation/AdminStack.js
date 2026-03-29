@@ -48,7 +48,7 @@ export default function AdminStack() {
       <Stack.Screen name="Admissions" component={AdmissionsScreen} options={({ navigation }) => ({ title: 'การรับนักเรียน', ...sharedHeaderOptions({ navigation }) })} />
       <Stack.Screen name="AdmissionDetail" component={AdmissionDetailScreen} options={({ route, navigation }) => ({ title: route.params?.admission?.name || 'รายละเอียด', ...sharedHeaderOptions({ navigation }) })} />
       <Stack.Screen name="Judges" component={JudgesScreen} options={({ navigation }) => ({ title: 'กรรมการตัดสิน', ...sharedHeaderOptions({ navigation }) })} />
-      <Stack.Screen name="Students" component={StudentsScreen} options={({ navigation }) => ({ title: 'รายชื่อนักเรียน', ...sharedHeaderOptions({ navigation }) })} />
+      <Stack.Screen name="Students" component={StudentsScreen} options={({ navigation }) => ({ title: 'การรับเข้า', ...sharedHeaderOptions({ navigation }) })} />
       <Stack.Screen name="Criteria" component={CriteriaScreen} options={({ navigation }) => ({ title: 'ลักษณะความสามารถ', ...sharedHeaderOptions({ navigation }) })} />
       <Stack.Screen name="Report" component={ReportScreen} options={({ navigation }) => ({ title: 'รายงานผล', ...sharedHeaderOptions({ navigation }) })} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={({ navigation }) => ({ title: 'ตั้งค่าระบบ', ...sharedHeaderOptions({ navigation }) })} />
