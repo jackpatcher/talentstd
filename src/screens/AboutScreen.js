@@ -58,6 +58,18 @@ function accentColor(items) {
 // ── ประวัติการพัฒนา ────────────────────────────────────────────
 const DEV_LOG = [
   {
+    date: '29 มีนาคม 2569',
+    title: 'ย้าย UI หลักไป Tamagui + ลบ NativeWind',
+    items: [
+      { type: 'feat',     text: 'สร้าง HomeScreen.tamagui.js (UI หลักแบบ Tamagui) พร้อมฟีเจอร์และขั้นตอนใช้งาน' },
+      { type: 'refactor', text: 'ลบ NativeWind และ tailwindcss ออกจาก dependencies ทั้งหมด' },
+      { type: 'refactor', text: 'migrate ModalComponent.js ไปใช้ Tamagui primitives แทน View/StyleSheet' },
+      { type: 'feat',     text: 'เพิ่ม tamagui.config.ts และ tamagui-font-sarabun.ts สำหรับฟอนต์ Sarabun ใน Tamagui' },
+      { type: 'style',    text: 'ปรับ modal, overlay, การ์ด, สี และฟอนต์ให้ตรงดีไซน์ใหม่' },
+      { type: 'learn',    text: 'การ migrate React Native UI ไป Tamagui ต้องปรับ props และ layout หลายจุด โดยเฉพาะ spacing และฟอนต์' },
+    ],
+  },
+  {
     date: '28 มีนาคม 2569',
     title: 'ปรับปรุง Schema นักเรียน + ปรับแต่ง About Screen',
     items: [

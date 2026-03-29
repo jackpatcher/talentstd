@@ -1,5 +1,5 @@
 git add .
-git commit -m "admin"
+git commit -m "test tamagui "
 git push -u origin main
 
 
